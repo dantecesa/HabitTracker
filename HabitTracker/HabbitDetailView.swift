@@ -16,12 +16,6 @@ struct HabbitDetailView: View {
         VStack {
             Form {
                 Section {
-                    TextField("Description", text: $withHabit.description)
-                } header: {
-                    Text("Description")
-                }
-                
-                Section {
                     HStack {
                         HStack(spacing:0) {
                             Text("\(withHabit.count)")
@@ -29,30 +23,50 @@ struct HabbitDetailView: View {
                                 .foregroundColor(.secondary)
                         }
                         Spacer()
-                        Text("\((withHabit.count / withHabit.goal).formatted(.percent))")
-                            .foregroundColor(.secondary)
+                        Text("\((Double(withHabit.count) / Double(withHabit.goal)).formatted(.percent))")
+                            .foregroundColor(withHabit.count > withHabit.goal ? .green : .secondary)
                     }
-                    
-                    Button(action: {
-                        withHabit.dateTime.insert(Date.now, at: 0)
-                    }, label: {
-                        Text("🥊  this task")
-                            .font(.title2)
-                    })
                 } header: {
                     Text("Goal")
                 }
                 
                 Section {
+                    TextField("Description", text: $withHabit.description)
+                } header: {
+                    Text("Description")
+                }
+                
+                Section {
+                    Button(action: {
+                        withAnimation {
+                            withHabit.dateTime.insert(Date.now, at: 0)
+                        }
+                    }, label: {
+                        Text("🥊  this task")
+                            .font(.title2)
+                    })
+                } header: {
+                    Text("Log a rep")
+                }
+                 
+                Section {
                     ForEach(withHabit.dateTime, id:\.self) { rep in
                         HStack {
-                            Text("\(rep)")
+                            let formattedDate = rep.formatted(date: .abbreviated, time: .omitted)
+                            let formattedTime = rep.formatted(date: .omitted, time: .shortened)
+                            
+                            VStack(alignment: .leading) {
+                                Text("\(formattedDate)")
+                                Text("\(formattedTime)")
+                                    .foregroundColor(.secondary)
+                            }
                             Spacer()
                             Text("1")
                         }
                     }
+                    .onDelete(perform: removeItems)
                 } header: {
-                    Text("Reps")
+                    Text("Previous reps")
                 }
             }
         }
@@ -60,6 +74,10 @@ struct HabbitDetailView: View {
         .onDisappear {
             tracker.habits[withIndex] = Habit(name: withHabit.name, description: withHabit.description, goal: withHabit.goal, dateTime: withHabit.dateTime)
         }
+    }
+    
+    func removeItems(atOffsets: IndexSet) {
+        withHabit.dateTime.remove(atOffsets: atOffsets)
     }
 }
 

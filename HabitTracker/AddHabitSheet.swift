@@ -10,19 +10,40 @@ import SwiftUI
 struct AddHabitSheet: View {
     @ObservedObject var tracker: HabitTracker
     @Environment(\.dismiss) var dismiss
-    @State var name: String = ""
+    
+    let defaultHabits: [String] = ["🏋🏻‍♂️ Get Fit", "🧑🏻‍💻 Learn to Code", "🎻 Learn an instrument", "🤓 Learn a language", "🧘🏻 Practice Mindfulness", "📚 Read More", "🤷🏻‍♂️ Other…"]
+    @State var selectedHabitIndex: Int? = nil
+    @State var customHabitName: String = ""
+    
     @State var description: String = ""
-    @State var goal: Int = 1
+    
+    @State var repetitionCount: Int? = nil
     let habbitTimes: [Int] = [1, 2, 5, 10, 12, 30, 365]
+    
     
     var body: some View {
         NavigationView {
             Form {
                 Section {
-                TextField("Enter a new habit…", text: $name)
+                    Picker("Enter a new habit…", selection: $selectedHabitIndex) {
+                        ForEach(0..<defaultHabits.count) { index in
+                            Text(defaultHabits[index]).tag(index as Int?)
+                        }
+                    }
                     .labelsHidden()
+                    .pickerStyle(.inline)
+                    
                 } header: {
-                    Text("Habit Name")
+                    Text("I'd like to…")
+                }
+                
+                if selectedHabitIndex == 6 {
+                    Section {
+                        TextField("Enter a habit…", text: $customHabitName)
+                            .labelsHidden()
+                    } header: {
+                    Text("Custom Habit")
+                    }
                 }
                 
                 Section {
@@ -33,9 +54,9 @@ struct AddHabitSheet: View {
                 }
                 
                 Section {
-                    Picker("What's your goal?", selection: $goal) {
+                    Picker("What's your goal?", selection: $repetitionCount) {
                         ForEach(0..<habbitTimes.count) { index in
-                            Text("\(habbitTimes[index])")
+                            Text("\(habbitTimes[index])").tag(index as Int?)
                         }
                     }.pickerStyle(.segmented)
                 } header: {
@@ -46,11 +67,17 @@ struct AddHabitSheet: View {
             .toolbar {
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
                     Button("Save") {
-                        let newHabit = Habit(name: name, description: description, goal: habbitTimes[goal], dateTime: [Date.now])
+                        let newHabit: Habit
+                        
+                        if selectedHabitIndex != 6 {
+                            newHabit = Habit(name: defaultHabits[selectedHabitIndex!], description: description, goal: habbitTimes[repetitionCount!], dateTime: [Date.now])
+                        } else {
+                            newHabit = Habit(name: customHabitName, description: description, goal: habbitTimes[repetitionCount!], dateTime: [Date.now])
+                        }
                         
                         tracker.habits.append(newHabit)
                         dismiss()
-                    }.disabled(name.count < 1)
+                    }.disabled(selectedHabitIndex == nil || repetitionCount == nil)
                 }
             }
         }
