@@ -11,7 +11,7 @@ struct AddHabitSheet: View {
     @ObservedObject var tracker: HabitTracker
     @Environment(\.dismiss) var dismiss
     
-    let defaultHabits: [String] = ["🏋🏻‍♂️ Get Fit", "🧑🏻‍💻 Learn to Code", "🎻 Learn an instrument", "🤓 Learn a language", "🧘🏻 Practice Mindfulness", "📚 Read More", "🤷🏻‍♂️ Other…"]
+    let defaultHabits: [String] = ["🏋🏻‍♂️ Get Fit", "🧑🏻‍💻 Learn to Code", "🎻 Learn an Instrument", "🤓 Learn a Language", "🧘🏻 Practice Mindfulness", "📚 Read More", "🤷🏻‍♂️ Other…"]
     @State var selectedHabitIndex: Int? = nil
     @State var customHabitName: String = ""
     
